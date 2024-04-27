@@ -10,6 +10,12 @@ const app = express();
 connectMongoDB();
 
 
+// Middlewares setup
+
+app.use(express.json()); // to parse req.body (application/json)
+app.use(express.urlencoded({ extended: true })); // to parse form-data(urlencoded)
+
+
 // imports required routers 
 import authRoutes from "./routes/auth.routes.js";
 
