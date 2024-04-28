@@ -39,7 +39,7 @@ const generateAccessAndRefreshTokens = async (userId, res) => {
       return res.status(404).json({ message: "User not found." })
     }
 
-    // Assign the refresh token to the user object, ensuring type safety
+    // Assign the refresh token to the user object
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
 

@@ -1,9 +1,8 @@
-import dotenv from "dotenv";
+import "dotenv/config";
 import express from "express";
+import cookieParser from "cookie-parser";
 import connectMongoDB from "./db/connectMongoDB.js";
 
-
-dotenv.config();
 
 const app = express();
 
@@ -14,9 +13,10 @@ connectMongoDB();
 
 app.use(express.json()); // to parse req.body (application/json)
 app.use(express.urlencoded({ extended: true })); // to parse form-data(urlencoded)
+app.use(cookieParser());
 
 
-// imports required routers 
+// imports required routers
 import authRoutes from "./routes/auth.routes.js";
 
 
