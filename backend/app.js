@@ -1,12 +1,20 @@
 import "dotenv/config";
 import express from "express";
 import cookieParser from "cookie-parser";
+import { v2 as cloudinary } from "cloudinary";
+
 import connectMongoDB from "./db/connectMongoDB.js";
 
 
 const app = express();
 
 connectMongoDB();
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 
 // Middlewares setup
@@ -18,10 +26,12 @@ app.use(cookieParser());
 
 // imports required routers
 import authRoutes from "./routes/auth.routes.js";
+import userRoutes from "./routes/user.routes.js";
 
 
 // all Routes
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/user", userRoutes);
 
 
 export default app;

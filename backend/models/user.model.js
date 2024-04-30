@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Password is required."],
       minLength: 6,
+      select: false,
     },
     followers: [
       {
@@ -51,6 +52,7 @@ const userSchema = new mongoose.Schema(
     },
     refreshToken: {
       type: String,
+      select: false,
     },
   },
   { timestamps: true }

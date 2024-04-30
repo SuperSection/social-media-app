@@ -1,12 +1,12 @@
 import User from "../models/user.model.js";
-import { accessTokenCookie, refreshTokenCookie } from "../constants.js";
-import { generateAccessAndRefreshTokens } from "../utils/generateTokens.js";
 import {
   accessTokenCookieOptions,
   clearCookieOptions,
   refreshTokenCookieOptions,
   verifyRefreshToken,
 } from "../utils/helper.js";
+import { accessTokenCookie, refreshTokenCookie } from "../constants.js";
+import { generateAccessAndRefreshTokens } from "../utils/generateTokens.js";
 
 
 /**
@@ -20,34 +20,34 @@ const signUp = async (req, res) => {
     if (!emailRegex.test(email)) {
       return res
         .status(400)
-        .json({ message: "Invalid email. Please provide a valid email." });
+        .json({ error: "Invalid email. Please provide a valid email." });
     }
 
     const existingUsername = await User.findOne({ username });
     if (existingUsername) {
-      return res.status(400).json({ message: "Username is already taken." });
+      return res.status(400).json({ error: "Username is already taken." });
     }
 
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
-      return res.status(400).json({ message: "Email is already in use." });
+      return res.status(400).json({ error: "Email is already in use." });
     }
 
     if (password.length < 6) {
       return res
         .status(400)
-        .json({ message: "Password must be at least 6 characters long." });
+        .json({ error: "Password must be at least 6 characters long." });
     }
 
     const newUser = await User.create({ fullName, email, username, password });
 
     if (!newUser) {
-      return res.status(400).json({ message: "User registration failed." });
+      return res.status(400).json({ error: "User registration failed." });
     }
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(newUser._id, res);
 
-    const createdUser = await User.findById(newUser._id).select("-password -refreshToken");
+    const createdUser = await User.findById(newUser._id);
 
     return res
       .status(201)
@@ -76,23 +76,21 @@ const signIn = async(req, res) => {
   try {
     const { username, password } = req.body;
     if (!username || !password) {
-      return res.status(400).json({ message: "Username and password are required." });
+      return res.status(400).json({ error: "Username and password are required." });
     }
 
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ username }).select("+password");
     const isPasswordCorrect = await user.comparePassword(password);
 
     if (!user || !isPasswordCorrect) {
-      return res.status(400).json({ message: "Invalid credentials." });
+      return res.status(400).json({ error: "Invalid credentials." });
     }
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id, res);
 
-    const loggedInUser = await User.findById(user._id).select(
-      "-password -refreshToken"
-    );
+    const loggedInUser = await User.findById(user._id);
     if (!loggedInUser) {
-      return res.status(400).json({ message: "User not found." });
+      return res.status(400).json({ error: "User not found." });
     }
 
     return res
@@ -122,7 +120,7 @@ const logout = async (req, res) => {
       req.user._id,
       { $unset: { refreshToken: 1 } },
       { new: true }
-    ).select("-password");
+    );
 
     if (!user) {
       return res.status(404).json({ message: "User not found." });
@@ -144,21 +142,19 @@ const logout = async (req, res) => {
 
 
 /**
- * Get the logged in User
+ * Get the authenticated User
  */
 const getUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select(
-      "-password -refreshToken"
-    );
+    const user = await User.findById(req.user._id);
     if (!user) {
-      return res.status(404).json({ message: "User not found." });
+      return res.status(404).json({ error: "User not found." });
     }
     return res.status(200).json(user);
     
   } catch (error) {
     return res.status(500).json({
-      message: "Internal Server Error while getting the authenticated User data",
+      message: "Internal Server Error while getting the Authenticated User data",
       error: error.message,
     });
   }
@@ -176,25 +172,25 @@ const refreshAccessToken = async (req, res) => {
     if (!incomingRefreshToken) {
       return res
         .status(401)
-        .json({ message: "Unauthorized request: No Token Provided." });
+        .json({ error: "Unauthorized request: No Token Provided." });
     }
 
     const decodedToken = verifyRefreshToken(incomingRefreshToken);
 
     if (!decodedToken) {
-      return res.status(400).json({ message: "Invalid Token Request." });
+      return res.status(400).json({ error: "Invalid Token Request." });
     }
 
     const user = await User.findById(decodedToken.userId);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found." });
+      return res.status(404).json({ error: "User not found." });
     }
 
     if (incomingRefreshToken !== user.refreshToken) {
       return res
         .status(401)
-        .json({ message: "Unauthorized access: Invalid Refresh Token." });
+        .json({ error: "Unauthorized access: Invalid Refresh Token." });
     }
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id, res);
