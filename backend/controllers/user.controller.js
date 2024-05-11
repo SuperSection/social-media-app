@@ -152,7 +152,7 @@ const updateUser = async (req, res) => {
         await cloudinary.uploader.destroy(user.profilePicture.split("/").pop().split(".")[0]);
       }
       const uploadedResponse = await cloudinary.uploader.upload(profilePicture);
-      profilePicture = uploadedResponse.secure_url;
+      user.profilePicture = uploadedResponse.secure_url;
     }
 
     if (coverImage) {
@@ -160,14 +160,14 @@ const updateUser = async (req, res) => {
         await cloudinary.uploader.destroy(user.coverImage.split("/").pop().split(".")[0]);
       }
       const uploadedResponse = await cloudinary.uploader.upload(coverImage);
-      coverImage = uploadedResponse.secure_url;
+      user.coverImage = uploadedResponse.secure_url;
     }
 
     user.fullName = fullName || user.fullName;
     user.bio = bio || user.bio;
     user.link = link || user.link;
-    user.profilePicture = profilePicture || user.profilePicture;
-    user.coverImage = coverImage || user.coverImage;
+    // user.profilePicture = profilePicture || user.profilePicture;
+    // user.coverImage = coverImage || user.coverImage;
 
     const updatedUser = await user.save();
     updatedUser.password = undefined;

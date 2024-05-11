@@ -50,6 +50,13 @@ const userSchema = new mongoose.Schema(
     link: {
       type: String,
     },
+    likedPosts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post",
+        default: [],
+      },
+    ],
     refreshToken: {
       type: String,
       select: false,

@@ -181,7 +181,7 @@ const refreshAccessToken = async (req, res) => {
       return res.status(400).json({ error: "Invalid Token Request." });
     }
 
-    const user = await User.findById(decodedToken.userId);
+    const user = await User.findById(decodedToken.userId).select("refreshToken");
 
     if (!user) {
       return res.status(404).json({ error: "User not found." });
