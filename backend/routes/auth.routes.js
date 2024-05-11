@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-  getUser,
+  getMyData,
   logout,
   refreshAccessToken,
   signIn,
@@ -15,7 +15,7 @@ router.post("/sign-in", signIn);
 
 // PROTECTED ROUTES
 router.post("/logout", verifyAuthenticatedUser, logout);
-router.get("/profile", verifyAuthenticatedUser, getUser);
+router.get("/profile", verifyAuthenticatedUser, getMyData);
 router.post("/refresh-token", refreshAccessToken);
 
 export default router;

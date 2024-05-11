@@ -144,7 +144,7 @@ const logout = async (req, res) => {
 /**
  * Get the authenticated User
  */
-const getUser = async (req, res) => {
+const getMyData = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     if (!user) {
@@ -211,4 +211,4 @@ const refreshAccessToken = async (req, res) => {
 
 
 
-export { signUp, signIn, logout, getUser, refreshAccessToken };
+export { signUp, signIn, logout, getMyData, refreshAccessToken };

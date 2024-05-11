@@ -1,4 +1,4 @@
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary } from "cloudinary";
 
 import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
@@ -20,7 +20,9 @@ const createPost = async (req, res) => {
     }
 
     if (!text && !img) {
-      return res.status(400).json({ error: "Post must have conte text or image." });
+      return res
+        .status(400)
+        .json({ error: "Post must have conte text or image." });
     }
 
     if (img) {
@@ -47,7 +49,6 @@ const createPost = async (req, res) => {
 };
 
 
-
 /**
  * Get all Posts
  */
@@ -59,12 +60,10 @@ const getAllPosts = async (req, res) => {
       .populate({ path: "comments.user", select: "-email" });
 
     if (posts.length === 0) {
-      return res
-        .status(200)
-        .json({ posts: [] });
+      return res.status(200).json({ posts: [] });
     }
 
-    res.status(200).json({ message: "Posts fetched successfully.", posts });
+    res.status(200).json(posts);
 
   } catch (error) {
     res.status(500).json({
@@ -73,7 +72,6 @@ const getAllPosts = async (req, res) => {
     });
   }
 };
-
 
 
 /**
@@ -90,7 +88,9 @@ const deletePost = async (req, res) => {
     }
 
     if (post.author.toString() !== userId.toString()) {
-      return res.status(403).json({ error: "You are not authorized to delete this post." });
+      return res
+        .status(403)
+        .json({ error: "You are not authorized to delete this post." });
     }
 
     if (post.img) {
@@ -109,7 +109,6 @@ const deletePost = async (req, res) => {
     });
   }
 };
-
 
 
 /**
@@ -141,16 +140,15 @@ const commentOnPost = async (req, res) => {
       type: "comment",
     });
 
-    res.status(200).json({ message: "Comment added successfully.", post });
-
+    res.status(200).json(post);
+    
   } catch (error) {
-    return res.status(500).json({
+    res.status(500).json({
       message: "Internal Server Error while Adding Comment.",
       error: error.message,
     });
   }
 };
-
 
 
 /**
@@ -173,6 +171,7 @@ const likeUnlikePost = async (req, res) => {
       // Unlike the post (revert liking)
       await Post.findByIdAndUpdate(postId, { $pull: { likes: userId } });
       await User.updateOne({ _id: userId }, { $pull: { likedPosts: postId } });
+      
       res.status(200).json({ message: "Post unliked successfully." });
 
     } else {
@@ -192,13 +191,12 @@ const likeUnlikePost = async (req, res) => {
     }
 
   } catch (error) {
-    return res.status(500).json({
+    res.status(500).json({
       message: "Internal Server Error while Liking or Reverting the Like on a Post.",
       error: error.message,
     });
   }
-}
-
+};
 
 
 /**
@@ -229,7 +227,6 @@ const getLikedPosts = async (req, res) => {
 };
 
 
-
 /**
  * Get Posts from the Followings
  */
@@ -250,14 +247,14 @@ const getFollowingPosts = async (req, res) => {
       .populate({ path: "comments.user", select: "-email" });
     
     res.status(200).json(feedPosts);
-    
+
   } catch (error) {
-   return res.status(500).json({
+    res.status(500).json({
       message: "Internal Server Error while Fetching Posts from the Followings.",
       error: error.message,
-    }); 
+    });
   }
-}
+};
 
 
 /**
